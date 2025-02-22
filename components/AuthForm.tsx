@@ -13,4 +13,11 @@ const AuthForm = () => {
 		confirmPassword: "",
 	});
 
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setForm((prev) => ({
+			...prev,
+			[name]: value,
+		}));
+	};
 export default AuthForm;
