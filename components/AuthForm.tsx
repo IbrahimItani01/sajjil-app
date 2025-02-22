@@ -32,19 +32,20 @@ const AuthForm = () => {
 	};
 
 	return (
-		<div className='w-full h-[100vh] flex items-center justify-center'>
-			<div className='w-[50%] mx-auto flex flex-col gap-10 border border-accent rounded-3xl p-5'>
-				<div className='flex flex-col items-center gap-2'>
+		<div className='min-h-screen flex items-center justify-center'>
+			<div className='w-[90%] sm:w-[80%] md:w-[50%] lg:w-[30%] h-auto flex flex-col gap-6 border border-accent rounded-3xl bg-white overflow-hidden p-6 sm:p-8'>
+				<div className='flex flex-col items-center gap-3'>
 					<Image
-						src='./logo.svg'
+						src='/logo.svg'
 						alt='logo'
-						width={100}
-						height={100}
+						width={80}
+						height={80}
 					/>
-					<h1 className='text-h2 font-poppins font-semibold'>
+					<h1 className='text-h3 font-poppins font-semibold text-center sm:text-h3'>
 						{isLogin ? "Welcome Back!" : "Create an Account"}
 					</h1>
 				</div>
+
 				<div className='flex flex-col gap-4'>
 					{!isLogin && (
 						<CustomInput
@@ -64,36 +65,40 @@ const AuthForm = () => {
 						value={form.email}
 						onChange={handleChange}
 					/>
-					<CustomInput
-						type='password'
-						label='Password'
-						name='password'
-						placeholder='********'
-						value={form.password}
-						onChange={handleChange}
-					/>
-					{!isLogin && (
+					<div className='flex gap-4 flex-col'>
 						<CustomInput
 							type='password'
-							label='Confirm Password'
-							name='confirmPassword'
+							label='Password'
+							name='password'
 							placeholder='********'
-							value={form.confirmPassword}
+							value={form.password}
 							onChange={handleChange}
 						/>
-					)}
+						{!isLogin && (
+							<CustomInput
+								type='password'
+								label='Confirm Password'
+								name='confirmPassword'
+								placeholder='********'
+								value={form.confirmPassword}
+								onChange={handleChange}
+							/>
+						)}
+					</div>
 				</div>
-				<div className='w-fit mx-auto'>
+
+				<div className='w-full flex justify-center'>
 					<ActionButton title={isLogin ? "Login" : "Register"} />
 				</div>
-				<div className='w-fit mx-auto text-sm font-inter'>
+
+				<div className='w-full text-text text-center text-sm font-inter'>
 					<p>
 						{isLogin ? "Don't have an account?" : "Already have an account?"}
 						<span
-							className='underline font-medium hover:text-accent cursor-pointer'
+							className='underline font-medium hover:text-accent cursor-pointer ml-1'
 							onClick={handleSwitch}
 						>
-							{isLogin ? " Register" : " Login"}
+							{isLogin ? "Register" : "Login"}
 						</span>
 					</p>
 				</div>
