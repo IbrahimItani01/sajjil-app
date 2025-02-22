@@ -1,4 +1,5 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -14,13 +15,16 @@ const ActionButton = ({
 	forLanding = false,
 }: ActionButtonProps) => {
 	const route = useRouter();
+	const [token, setToken] = React.useState<string | null>(null);
+
+	React.useEffect(() => {
+		setToken(localStorage.getItem("token"));
+	}, []);
+
 	const handleNavigate = () => {
-		if (localStorage.getItem("token")) {
-			route.push("/dashboard");
-		} else {
-			route.push("/auth");
-		}
+		route.push(token ? "/dashboard" : "/auth");
 	};
+
 	return (
 		<div
 			onClick={!forLanding ? onPress : handleNavigate}
