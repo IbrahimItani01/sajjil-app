@@ -20,4 +20,15 @@ const AuthForm = () => {
 			[name]: value,
 		}));
 	};
+
+	const handleSwitch = () => {
+		setIsLogin((prev) => !prev);
+		setForm({
+			name: "",
+			email: "",
+			password: "",
+			confirmPassword: "",
+		});
+	};
+
 export default AuthForm;
