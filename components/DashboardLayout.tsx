@@ -1,11 +1,16 @@
-// DashboardLayout.tsx
 "use client";
 
+import React from "react";
+import { useDispatch } from "react-redux";
+import { addTask } from "@/redux/slices/tasks.slice";
 import FAB from "./base/FAB";
 import { usePathname } from "next/navigation";
+import AddTaskForm from "./dashboard/AddTaskForm";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 	const pathname = usePathname();
+	const dispatch = useDispatch();
+	const [showAdd, setShowAdd] = React.useState(false);
 
 	const pageTitles: { [key: string]: string } = {
 		"/dashboard/today": "Today's Tasks",
@@ -14,8 +19,25 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	const showFAB = pathname === "/dashboard";
-	const handleAddTask = () => {
-		console.log("df");
+	const toggleAddTask = () => {
+		setShowAdd(!showAdd);
+	};
+
+	// Function to handle saving a new task
+	const handleSaveTask = (newTask: {
+		title: string;
+		description: string;
+		priority: "!!!" | "!!" | "!";
+		date: string;
+	}) => {
+		dispatch(
+			addTask({
+				...newTask,
+				priority: newTask.priority as "!!!" | "!!" | "!", // Ensure priority type matches
+				completed: false,
+			})
+		);
+		setShowAdd(false); // Close the form after adding the task
 	};
 
 	return (
@@ -29,8 +51,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 					{children}
 				</div>
 			</div>
-
-			{showFAB && <FAB onPress={handleAddTask} />}
+			{showAdd && <AddTaskForm onSave={handleSaveTask} toggleAddTask={toggleAddTask} />}
+			{showFAB && <FAB onPress={toggleAddTask} />}
 		</div>
 	);
 };
