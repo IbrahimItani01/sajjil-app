@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "@/redux/slices/auth.slice";
 import ActionButton from "./base/ActionButton";
 import ErrorMessage from "./base/ErrorMessage";
 import { validateForm } from "@/lib/utils/auth.utils";
@@ -16,6 +18,8 @@ const AuthForm = () => {
 		password: "",
 		confirmPassword: "",
 	});
+
+	const dispatch = useDispatch();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -36,15 +40,30 @@ const AuthForm = () => {
 		setError("");
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (!validateForm({ isLogin, form, setError })) return;
+
 		setForm({
 			name: "",
 			email: "",
 			password: "",
 			confirmPassword: "",
 		});
-		// TODO: Handle api call
+
+		try {
+			if (isLogin) {
+				const response = {
+					user: { id: "123", username: form.name, email: form.email },
+					token: "fake-token",
+				};
+
+				dispatch(login({ user: response.user, token: response.token }));
+			} else {
+				console.log("Registration logic");
+			}
+		} catch (_) {
+			setError("An error occurred. Please try again.");
+		}
 	};
 
 	return (
