@@ -1,10 +1,11 @@
 import Navbar from "@/components/base/NavBar";
+import DashboardLayout from "@/components/DashboardLayout";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<div>
 			<Navbar />
-			<main className='p-4'>{children}</main>
+			<DashboardLayout>{children}</DashboardLayout>
 		</div>
 	);
 };
