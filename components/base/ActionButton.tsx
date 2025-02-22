@@ -12,6 +12,14 @@ const ActionButton = ({
 	title,
 	onPress,
 	forLanding = false,
-}: ActionButtonProps) => {};
+}: ActionButtonProps) => {
+	const route = useRouter();
+	const handleNavigate = () => {
+		if (localStorage.getItem("token")) {
+			route.push("/dashboard");
+		} else {
+			route.push("/auth");
+		}
+	};
 
 export default ActionButton;
