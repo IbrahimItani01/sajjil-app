@@ -3,7 +3,6 @@ import { AuthForm } from "../interfaces/auth.interfaces";
 export const isValidEmail = (email: string) => {
 	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
-
 type valiateFormParams = {
 	isLogin: boolean;
 	form: AuthForm;
