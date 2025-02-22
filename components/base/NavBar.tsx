@@ -1,8 +1,11 @@
 "use client";
 import { useState } from "react";
-import { Menu, X, LogOut, User } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
+import { Menu, X } from "lucide-react";
+import NavbarLogo from "../navbar/NavbarLogo";
+import NavbarMenu from "../navbar/NavbarMenu";
+import UserBubble from "../navbar/UserBubble";
+import Logout from "../navbar/Logout";
+import MobileMenu from "../navbar/MobileMenu";
 
 const Navbar = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -10,51 +13,15 @@ const Navbar = () => {
 	return (
 		<nav className='bg-accentLight text-text font-poppins px-6 py-4'>
 			<div className='container mx-auto flex justify-between items-center'>
-				{/* Logo */}
-				<Link
-					href='/dashboard'
-					className='text-xl font-bold text-primary flex items-center gap-2'
-				>
-					<Image
-						src='/logo.svg'
-						alt='logo'
-						height={30}
-						width={30}
-					/>
-					Sajjil
-				</Link>
+				<NavbarLogo />
 
-				{/* Desktop Menu - Centered */}
-				<div className='hidden md:flex space-x-6 absolute left-1/2 transform -translate-x-1/2 font-inter font-semibold'>
-					<Link
-						href='/dashboard/today'
-						className='hover:text-primary'
-					>
-						Today
-					</Link>
-					<Link
-						href='/dashboard/completed'
-						className='hover:text-primary'
-					>
-						Completed
-					</Link>
-				</div>
+				<NavbarMenu className='hidden md:flex absolute left-1/2 gap-10 transform -translate-x-1/2' />
 
-				{/* User Bubble + Logout (Desktop) */}
 				<div className='hidden md:flex items-center space-x-4'>
-					{/* User Info */}
-					<div className='flex items-center bg-gray-200 text-gray-800 px-3 py-1 rounded-full space-x-2 cursor-default'>
-						<User size={20} />
-						<span className='text-sm font-poppins font-medium'>John Doe</span>
-					</div>
-
-					{/* Logout Button */}
-					<button className='text-black hover:text-primary transition'>
-						<LogOut size={22} />
-					</button>
+					<UserBubble />
+					<Logout />
 				</div>
 
-				{/* Mobile Menu Button */}
 				<button
 					className='md:hidden text-text hover:text-primary transition'
 					onClick={() => setIsOpen(!isOpen)}
@@ -63,35 +30,7 @@ const Navbar = () => {
 				</button>
 			</div>
 
-			{/* Mobile Menu Dropdown */}
-			{isOpen && (
-				<div className='md:hidden mt-5 space-y-3 text-center font-inter font-medium'>
-					{/* User Bubble + Logout (Mobile) */}
-					<div className='flex justify-between items-center space-x-4'>
-						<div className='flex items-center bg-gray-200 text-gray-800 px-3 py-1 rounded-full space-x-2 cursor-default'>
-							<User size={20} />
-							<span className='text-sm font-medium font-poppins'>John Doe</span>
-						</div>
-
-						{/* Logout Button */}
-						<button className='text-black hover:text-primary transition'>
-							<LogOut size={22} />
-						</button>
-					</div>
-					<Link
-						href='/dashboard/today'
-						className='block py-2 hover:text-primary'
-					>
-						Today
-					</Link>
-					<Link
-						href='/dashboard/completed'
-						className='block py-2 hover:text-primary'
-					>
-						Completed
-					</Link>
-				</div>
-			)}
+			{isOpen && <MobileMenu />}
 		</nav>
 	);
 };
