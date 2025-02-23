@@ -8,28 +8,31 @@ import { RootState } from "../../../redux/store";
 const Page = () => {
 	const tasks = useSelector((state: RootState) => state.tasks);
 
+	// Filter only completed tasks
 	const completedTasks = tasks.filter((task) => task.completed);
 
+	// Define priority order for sorting
+	const priorityOrder: Record<"HIGH" | "MEDIUM" | "LOW", number> = {
+		HIGH: 3,
+		MEDIUM: 2,
+		LOW: 1,
+	};
+
+	// Sort completed tasks by date first, then by priority (higher first)
 	const sortedCompletedTasks = completedTasks.slice().sort((a, b) => {
 		const dateComparison =
 			new Date(a.date).getTime() - new Date(b.date).getTime();
 		if (dateComparison !== 0) return dateComparison;
-
-		const priorityOrder = { "!!!": 3, "!!": 2, "!": 1 };
-		return priorityOrder[a.priority] - priorityOrder[b.priority];
+		return priorityOrder[b.priority] - priorityOrder[a.priority];
 	});
 
 	return (
 		<div className='flex flex-col gap-3'>
 			{sortedCompletedTasks.length > 0 ? (
-				sortedCompletedTasks.map((task, index) => (
+				sortedCompletedTasks.map((task) => (
 					<TaskCard
-						key={index}
-						title={task.title}
-						description={task.description}
-						priority={task.priority}
-						date={task.date}
-						completed={task.completed}
+						key={task.id}
+						{...task}
 					/>
 				))
 			) : (
