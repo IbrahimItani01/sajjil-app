@@ -1,6 +1,6 @@
 "use client";
 import { Pencil, Trash2, CheckCircle } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
 	deleteTask as deleteTaskRedux,
 	toggleTask as toggleTaskRedux,
@@ -8,16 +8,8 @@ import {
 } from "@/redux/slices/tasks.slice";
 import { useState } from "react";
 import AddTaskForm from "./AddTaskForm";
-import { RootState } from "@/redux/store";
 import { deleteTask, updateTask } from "@/apis/tasks/tasks.route";
-
-// Helper Function: Format Date (DD/MM/YYYY)
-const formatDate = (dateString: string) => {
-	const date = new Date(dateString);
-	return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
-		.toString()
-		.padStart(2, "0")}/${date.getFullYear()}`;
-};
+import { formatDate } from "@/lib/utils";
 
 const TaskCard = ({
 	id,
@@ -34,7 +26,6 @@ const TaskCard = ({
 }) => {
 	const dispatch = useDispatch();
 	const [isEditing, setIsEditing] = useState(false);
-	const tasks = useSelector((state: RootState) => state.tasks);
 	const token = localStorage.token; // Get token
 
 	// Priority Symbols Mapping
