@@ -4,22 +4,22 @@ import React, { useState, useEffect } from "react";
 import CustomInput from "../base/CustomInput";
 import ActionButton from "../base/ActionButton";
 import PrioritySelector from "./base/PrioritySelector";
-import { createTask } from "@/apis/tasks/tasks.route"; // Import your createTask API function
-import { updateTask } from "@/apis/tasks/tasks.route"; // Import your updateTask API function
+import { createTask } from "@/apis/tasks/tasks.route";
+import { updateTask } from "@/apis/tasks/tasks.route";
 
 interface AddTaskFormProps {
 	toggleAddTask: () => void;
 	initialTask?: {
 		id: string;
 		description: string;
-		priority: "!" | "!!" | "!!!"; // Ensure priority is correctly typed
+		priority: "!" | "!!" | "!!!";
 		date: string;
 		completed: boolean;
 	};
 	onSave: (task: {
 		id: string;
 		description: string;
-		priority: "HIGH" | "MEDIUM" | "LOW"; // Changed to match API
+		priority: "HIGH" | "MEDIUM" | "LOW";
 		date: string;
 		completed: boolean;
 	}) => void;
@@ -34,14 +34,14 @@ const AddTaskForm = ({
 		id?: string;
 		description: string;
 		date: string;
-		priority: "!" | "!!" | "!!!"; // Correctly type priority here
+		priority: "!" | "!!" | "!!!";
 		completed: boolean;
 	}>({
-		id: "", // Task ID (empty when creating new task)
+		id: "",
 		description: "",
 		date: "",
-		priority: "!", // Default priority to !
-		completed: false, // Default to not completed
+		priority: "!",
+		completed: false,
 	});
 
 	// Load initialTask into state if editing
@@ -72,7 +72,7 @@ const AddTaskForm = ({
 			case "!":
 				return "LOW";
 			default:
-				return "LOW"; // Default if not mapped correctly
+				return "LOW";
 		}
 	};
 
@@ -87,7 +87,7 @@ const AddTaskForm = ({
 
 			const formattedTaskData = {
 				...taskData,
-				date: formattedDate, // Set the correctly formatted date
+				date: formattedDate,
 				priority: mapPriorityToAPI(taskForm.priority),
 			};
 
@@ -106,7 +106,6 @@ const AddTaskForm = ({
 				onSave(newTask);
 			}
 
-			// Close the modal
 			toggleAddTask();
 		} catch (error) {
 			console.error("Error while submitting the task:", error);

@@ -37,7 +37,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 				completed: false,
 			})
 		);
-		setShowAdd(false); // Close the form after adding the task
+		setShowAdd(false);
 	};
 
 	return (
@@ -51,7 +51,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 					{children}
 				</div>
 			</div>
-			{showAdd && <AddTaskForm onSave={handleSaveTask} toggleAddTask={toggleAddTask} />}
+			{showAdd && (
+				<AddTaskForm
+					onSave={handleSaveTask}
+					toggleAddTask={toggleAddTask}
+				/>
+			)}
 			{showFAB && <FAB onPress={toggleAddTask} />}
 		</div>
 	);

@@ -1,8 +1,8 @@
 import React from "react";
 
 interface PrioritySelectorProps {
-	value: "!" | "!!" | "!!!"; // Ensures value is one of these three types
-	onChange: (priority: "!" | "!!" | "!!!") => void; // Ensures onChange accepts one of these types
+	value: "!" | "!!" | "!!!";
+	onChange: (priority: "!" | "!!" | "!!!") => void;
 }
 
 const PrioritySelector: React.FC<PrioritySelectorProps> = ({
@@ -27,7 +27,7 @@ const PrioritySelector: React.FC<PrioritySelectorProps> = ({
 							name='priority'
 							value={p}
 							checked={value === p}
-							onChange={() => onChange(p as "!" | "!!" | "!!!")} // Explicitly cast p
+							onChange={() => onChange(p as "!" | "!!" | "!!!")}
 							className='hidden'
 						/>
 						<span

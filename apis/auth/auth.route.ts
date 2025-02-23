@@ -18,7 +18,7 @@ export const registerUser = async ({ name, email, password }: AuthForm) => {
 };
 
 export const loginUser = async ({ email, password }: AuthForm) => {
-    try {
+	try {
 		const response = await axios.post(`${API_URL}/auth/login`, {
 			email,
 			password,

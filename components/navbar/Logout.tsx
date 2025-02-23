@@ -2,8 +2,8 @@
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { logout } from "@/redux/slices/auth.slice"; // Use the logout action
-import { resetTasks } from "@/redux/slices/tasks.slice"; // Assuming this action exists
+import { logout } from "@/redux/slices/auth.slice";
+import { resetTasks } from "@/redux/slices/tasks.slice";
 
 const Logout = ({ className }: { className?: string }) => {
 	const router = useRouter();
@@ -11,14 +11,12 @@ const Logout = ({ className }: { className?: string }) => {
 
 	// Handle logout logic
 	const handleLogout = () => {
-		// Clear the localStorage
 		localStorage.clear();
 
 		// Reset the auth state and tasks state in the Redux store
-		dispatch(logout()); // Use the logout action to reset auth state
-		dispatch(resetTasks()); // Reset tasks state (if this action exists)
+		dispatch(logout());
+		dispatch(resetTasks());
 
-		// Redirect to the homepage
 		router.push("/");
 	};
 

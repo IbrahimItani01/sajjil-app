@@ -6,6 +6,12 @@ export type CreateTaskDto = {
 	priority: "LOW" | "MEDIUM" | "HIGH";
 	date: string;
 };
+export type UpdateTaskDto = {
+	description?: string;
+	priority?: "LOW" | "MEDIUM" | "HIGH";
+	date?: string;
+	completed?: boolean;
+};
 
 export const createTask = async (
 	createTaskDto: CreateTaskDto,
@@ -23,6 +29,7 @@ export const createTask = async (
 		throw error;
 	}
 };
+
 export const getTasks = async (token: string) => {
 	try {
 		const response = await axios.get(`${API_URL}/tasks`, {
@@ -30,19 +37,12 @@ export const getTasks = async (token: string) => {
 				Authorization: `Bearer ${token}`,
 			},
 		});
-        console.log(response.data)
+		console.log(response.data);
 		return response.data;
 	} catch (error) {
 		console.error("Get Tasks Error:", error);
 		throw error;
 	}
-};
-
-export type UpdateTaskDto = {
-	description?: string;
-	priority?: "LOW" | "MEDIUM" | "HIGH";
-	date?: string;
-	completed?: boolean;
 };
 
 export const updateTask = async (
@@ -68,16 +68,15 @@ export const updateTask = async (
 };
 
 export const deleteTask = async (id: string, token: string) => {
-    try {
-      const response = await axios.delete(`${API_URL}/tasks/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Delete Task Error:", error);
-      throw error;
-    }
-  };
-  
+	try {
+		const response = await axios.delete(`${API_URL}/tasks/${id}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		return response.data;
+	} catch (error) {
+		console.error("Delete Task Error:", error);
+		throw error;
+	}
+};

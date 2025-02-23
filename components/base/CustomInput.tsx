@@ -5,12 +5,7 @@ interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 	label?: string;
 }
 
-const CustomInput = ({
-	label,
-	type,
-	className,
-	...rest
-}: CustomInputProps) => {
+const CustomInput = ({ label, type, className, ...rest }: CustomInputProps) => {
 	const [visible, setVisible] = useState(false);
 	const isPassword = type === "password";
 

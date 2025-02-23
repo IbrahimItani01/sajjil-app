@@ -44,7 +44,7 @@ const AuthForm = () => {
 			password: "",
 			confirmPassword: "",
 		});
-		setError(""); // Reset error
+		setError("");
 	};
 
 	// Handle form submission (login or register)
@@ -56,10 +56,8 @@ const AuthForm = () => {
 
 			// Handle registration or login
 			if (!isLogin) {
-				// Register new user
 				({ message, name, token } = await registerUser(form));
 			} else {
-				// Login user
 				({ message, name, token } = await loginUser(form));
 			}
 
@@ -77,23 +75,22 @@ const AuthForm = () => {
 			);
 
 			// Fetch tasks after successful login/registration
-			const tasks = await getTasks(token); // Assume getTasks fetches tasks from the server using the token
+			const tasks = await getTasks(token);
 
 			// Dispatch tasks to Redux store
-			dispatch(resetTasks()); // Clear any existing tasks
+			dispatch(resetTasks());
+
 			tasks.forEach((task: Task) => {
-				dispatch(addTask(task)); // Add each task to the store
+				dispatch(addTask(task));
 			});
 
 			console.log(message);
 
-			// Redirect to dashboard after success
 			router.push("/dashboard");
 		} catch (error: unknown) {
 			setError(error.response?.data?.message || "Something went wrong");
 		}
 
-		// Reset form fields
 		setForm({
 			name: "",
 			email: "",
