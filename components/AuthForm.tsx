@@ -8,6 +8,10 @@ import { validateForm } from "@/lib/utils/auth.utils";
 import FormFooter from "./auth/FormFooter";
 import FormHeader from "./auth/FormHeader";
 import FormBody from "./auth/FormBody";
+import { loginUser, registerUser } from "@/apis/auth/auth.route";
+import { useRouter } from "next/navigation";
+import { getTasks } from "@/apis/tasks/tasks.route";
+import { addTask, resetTasks, Task } from "@/redux/slices/tasks.slice";
 
 const AuthForm = () => {
 	const [isLogin, setIsLogin] = useState(true);
@@ -20,7 +24,9 @@ const AuthForm = () => {
 	});
 
 	const dispatch = useDispatch();
+	const router = useRouter();
 
+	// Handle form field changes
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		setForm((prev) => ({
@@ -29,6 +35,7 @@ const AuthForm = () => {
 		}));
 	};
 
+	// Switch between login and register forms
 	const handleSwitch = () => {
 		setIsLogin((prev) => !prev);
 		setForm({
@@ -37,33 +44,62 @@ const AuthForm = () => {
 			password: "",
 			confirmPassword: "",
 		});
-		setError("");
+		setError(""); // Reset error
 	};
 
+	// Handle form submission (login or register)
 	const handleSubmit = async () => {
 		if (!validateForm({ isLogin, form, setError })) return;
 
+		try {
+			let message, name, token;
+
+			// Handle registration or login
+			if (!isLogin) {
+				// Register new user
+				({ message, name, token } = await registerUser(form));
+			} else {
+				// Login user
+				({ message, name, token } = await loginUser(form));
+			}
+
+			// Store the token in localStorage
+			localStorage.setItem("token", token);
+
+			// Dispatch login action
+			dispatch(
+				login({
+					user: {
+						username: name,
+					},
+					token,
+				})
+			);
+
+			// Fetch tasks after successful login/registration
+			const tasks = await getTasks(token); // Assume getTasks fetches tasks from the server using the token
+
+			// Dispatch tasks to Redux store
+			dispatch(resetTasks()); // Clear any existing tasks
+			tasks.forEach((task: Task) => {
+				dispatch(addTask(task)); // Add each task to the store
+			});
+
+			console.log(message);
+
+			// Redirect to dashboard after success
+			router.push("/dashboard");
+		} catch (error: unknown) {
+			setError(error.response?.data?.message || "Something went wrong");
+		}
+
+		// Reset form fields
 		setForm({
 			name: "",
 			email: "",
 			password: "",
 			confirmPassword: "",
 		});
-
-		try {
-			if (isLogin) {
-				const response = {
-					user: { id: "123", username: form.name, email: form.email },
-					token: "fake-token",
-				};
-
-				dispatch(login({ user: response.user, token: response.token }));
-			} else {
-				console.log("Registration logic");
-			}
-		} catch (_) {
-			setError("An error occurred. Please try again.");
-		}
 	};
 
 	return (
@@ -73,7 +109,7 @@ const AuthForm = () => {
 				onClose={() => setError("")}
 			/>
 
-			<div className='w-[90%] sm:w-[80%] md:w-[50%] lg:w-[30%] h-auto flex flex-col gap-6 border border-accent rounded-3xl bg-white overflow-hidden px-5 py-3 '>
+			<div className='w-[90%] sm:w-[80%] md:w-[50%] lg:w-[30%] h-auto flex flex-col gap-6 border border-accent rounded-3xl bg-white overflow-hidden px-5 py-3'>
 				<FormHeader isLogin={isLogin} />
 
 				<FormBody
