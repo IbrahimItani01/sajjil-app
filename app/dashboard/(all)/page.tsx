@@ -8,28 +8,24 @@ import { RootState } from "../../../redux/store";
 const Page = () => {
 	const tasks = useSelector((state: RootState) => state.tasks);
 
-	const sortedTasks = tasks.slice().sort((a, b) => {
-		// First, compare by date
-		const dateComparison =
-			new Date(a.date).getTime() - new Date(b.date).getTime();
-		if (dateComparison !== 0) return dateComparison;
+	// Define priority order for sorting
+	const priorityOrder: Record<"HIGH" | "MEDIUM" | "LOW", number> = {
+		HIGH: 3,
+		MEDIUM: 2,
+		LOW: 1,
+	};
 
-		// Then, compare by priority (high to low)
-		const priorityOrder = { "!!!": 3, "!!": 2, "!": 1 };
-		return priorityOrder[b.priority] - priorityOrder[a.priority]; // Reverse order for descending priority
+	// Sort tasks by date first, then by priority (higher first)
+	const sortedTasks = tasks.slice().sort((a, b) => {
+		const dateComparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+		if (dateComparison !== 0) return dateComparison;
+		return priorityOrder[b.priority] - priorityOrder[a.priority];
 	});
 
 	return (
 		<div className='flex flex-col gap-3'>
-			{sortedTasks.map((task, index) => (
-				<TaskCard
-					key={index}
-					title={task.title}
-					description={task.description}
-					priority={task.priority}
-					date={task.date}
-					completed={task.completed}
-				/>
+			{sortedTasks.map((task) => (
+				<TaskCard key={task.id} {...task} />
 			))}
 		</div>
 	);
