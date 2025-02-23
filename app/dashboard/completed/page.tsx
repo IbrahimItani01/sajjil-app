@@ -4,21 +4,13 @@ import TaskCard from "@/components/dashboard/TaskCard";
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
+import { priorityOrder } from "@/lib/constants/main";
 
 const Page = () => {
 	const tasks = useSelector((state: RootState) => state.tasks);
 
-	// Filter only completed tasks
 	const completedTasks = tasks.filter((task) => task.completed);
 
-	// Define priority order for sorting
-	const priorityOrder: Record<"HIGH" | "MEDIUM" | "LOW", number> = {
-		HIGH: 3,
-		MEDIUM: 2,
-		LOW: 1,
-	};
-
-	// Sort completed tasks by date first, then by priority (higher first)
 	const sortedCompletedTasks = completedTasks.slice().sort((a, b) => {
 		const dateComparison =
 			new Date(a.date).getTime() - new Date(b.date).getTime();

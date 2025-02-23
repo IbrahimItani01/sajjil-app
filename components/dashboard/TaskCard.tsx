@@ -46,8 +46,8 @@ const TaskCard = ({
 	const handleDelete = async (e: React.MouseEvent) => {
 		e.stopPropagation();
 		try {
-			await deleteTask(id, token); // Call API to delete task
-			dispatch(deleteTaskRedux(id)); // Update Redux state
+			await deleteTask(id, token);
+			dispatch(deleteTaskRedux(id));
 		} catch (error) {
 			console.error("Failed to delete task:", error);
 		}
@@ -55,10 +55,10 @@ const TaskCard = ({
 
 	// Handle Task Completion Toggle
 	const handleToggle = async () => {
-		const updatedCompletedStatus = !completed; // Toggle completed status
+		const updatedCompletedStatus = !completed;
 		try {
-			await updateTask(id, { completed: updatedCompletedStatus }, token); // Call API to update task
-			dispatch(toggleTaskRedux(id)); // Update Redux state
+			await updateTask(id, { completed: updatedCompletedStatus }, token);
+			dispatch(toggleTaskRedux(id));
 		} catch (error) {
 			console.error("Failed to toggle task completion:", error);
 		}
@@ -82,7 +82,7 @@ const TaskCard = ({
 				{ ...updatedTask, completed },
 				token
 			);
-			dispatch(updateTaskRedux(updatedTaskData)); // Update Redux state
+			dispatch(updateTaskRedux(updatedTaskData));
 			setIsEditing(false);
 		} catch (error) {
 			console.error("Failed to update task:", error);
@@ -112,12 +112,10 @@ const TaskCard = ({
 
 				{/* Priority & Date */}
 				<div className='mt-2 flex justify-between items-center'>
-					{/* Priority Indicator */}
 					<span className={priorityStyles[priority]}>
 						{prioritySymbols[priority]}
 					</span>
 
-					{/* Date Display */}
 					<p className='text-sm text-gray-600'>{formatDate(date)}</p>
 				</div>
 
@@ -126,7 +124,6 @@ const TaskCard = ({
 
 				{/* Action Buttons */}
 				<div className='flex justify-end space-x-3 mt-2'>
-					{/* Edit Button (Disabled if task is completed) */}
 					{!completed && (
 						<button
 							onClick={handleEdit}
