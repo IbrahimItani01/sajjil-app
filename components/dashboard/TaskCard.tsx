@@ -1,70 +1,78 @@
 "use client";
 import { Pencil, Trash2, CheckCircle } from "lucide-react";
-import { formatDate } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteTask, toggleTask, updateTask } from "@/redux/slices/tasks.slice";
 import { useState } from "react";
-import AddTaskForm from "./AddTaskForm"; // Import AddTaskForm
+import AddTaskForm from "./AddTaskForm";
 import { RootState } from "@/redux/store";
 
+// Helper Function: Format Date (DD/MM/YYYY)
+const formatDate = (dateString: string) => {
+	const date = new Date(dateString);
+	return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
+		.toString()
+		.padStart(2, "0")}/${date.getFullYear()}`;
+};
+
 const TaskCard = ({
-	title,
+	id,
 	description,
 	priority,
 	date,
 	completed,
 }: {
-	title: string;
+	id: string;
 	description: string;
-	priority: "!!!" | "!!" | "!";
+	priority: "HIGH" | "MEDIUM" | "LOW";
 	date: string;
 	completed: boolean;
 }) => {
 	const dispatch = useDispatch();
 	const [isEditing, setIsEditing] = useState(false);
-	const tasks = useSelector((state: RootState) => state.tasks); // Access tasks from the store
+	const tasks = useSelector((state: RootState) => state.tasks);
+
+	// Priority Symbols Mapping
+	const prioritySymbols: Record<"HIGH" | "MEDIUM" | "LOW", string> = {
+		HIGH: "!!!",
+		MEDIUM: "!!",
+		LOW: "!",
+	};
 
 	// Priority Styles
-	const priorityStyles: { [key: string]: string } = {
-		"!": "text-green-500 text-2xl font-extrabold",
-		"!!": "text-yellow-500 text-2xl font-extrabold",
-		"!!!": "text-red-500 text-2xl font-extrabold",
+	const priorityStyles: Record<"HIGH" | "MEDIUM" | "LOW", string> = {
+		HIGH: "text-red-500 text-2xl font-extrabold",
+		MEDIUM: "text-yellow-500 text-2xl font-extrabold",
+		LOW: "text-green-500 text-2xl font-extrabold",
 	};
 
-	// Handle Delete
+	// Handle Task Deletion
 	const handleDelete = (e: React.MouseEvent) => {
-		e.stopPropagation(); // Prevent toggling when clicking delete
-		dispatch(deleteTask(title));
+		e.stopPropagation();
+		dispatch(deleteTask(id));
 	};
 
-	// Handle Toggle Completed
+	// Handle Task Completion Toggle
 	const handleToggle = () => {
-		dispatch(toggleTask(title));
+		dispatch(toggleTask(id));
 	};
 
-	// Handle Edit (Stops event from toggling completion)
+	// Handle Edit Task
 	const handleEdit = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		setIsEditing(true);
 	};
 
-	// Handle Save Edits
+	// Handle Save Edit
 	const handleSaveEdit = (updatedTask: {
-		title: string;
 		description: string;
-		priority: string;
+		priority: "HIGH" | "MEDIUM" | "LOW";
 		date: string;
 	}) => {
 		dispatch(
 			updateTask({
+				id,
 				...updatedTask,
-				priority: updatedTask.priority as "!!!" | "!!" | "!",
-				completed:
-					tasks.find((task) => task.title === updatedTask.title)?.completed ??
-					false,
-				date: updatedTask.date,
-				description: updatedTask.description,
-				title: updatedTask.title,
+				completed: tasks.find((task) => task.id === id)?.completed ?? false,
 			})
 		);
 		setIsEditing(false);
@@ -72,12 +80,12 @@ const TaskCard = ({
 
 	return (
 		<>
-			{/* Show Edit Form if isEditing is true */}
+			{/* Edit Form Display */}
 			{isEditing && (
 				<AddTaskForm
 					toggleAddTask={() => setIsEditing(false)}
-					initialTask={{ title, description, priority, date }} // Pass current task data
-					onSave={handleSaveEdit} // Handle save logic
+					initialTask={{ id, description, priority, date }}
+					onSave={handleSaveEdit}
 				/>
 			)}
 
@@ -88,33 +96,24 @@ const TaskCard = ({
 					completed ? "bg-blue-100" : "bg-blue-300"
 				}`}
 			>
-				<div className='flex justify-between items-start'>
-					{/* Priority + Title */}
-					<div className='flex items-center gap-2'>
-						<span
-							className={
-								priorityStyles[priority] || "text-gray-700 text-xl font-bold"
-							}
-						>
-							{priority}
-						</span>
-						<div>
-							<h3 className='font-bold text-lg'>{title}</h3>
-							<p className='text-sm text-gray-600'>{formatDate(date)}</p>
-						</div>
-					</div>
+				{/* Task Description */}
+				<div className='text-sm text-gray-700'>{description}</div>
 
-					{/* Show CheckCircle if completed */}
-					{completed && <CheckCircle className='text-green-500' />}
+				{/* Priority & Date */}
+				<div className='mt-2 flex justify-between items-center'>
+					{/* Priority Indicator */}
+					<span className={priorityStyles[priority]}>{prioritySymbols[priority]}</span>
+
+					{/* Date Display */}
+					<p className='text-sm text-gray-600'>{formatDate(date)}</p>
 				</div>
 
-				{/* Description */}
-				<div className='mt-2 text-sm text-gray-700'>{description}</div>
+				{/* Completed Indicator */}
+				{completed && <CheckCircle className='text-green-500 mt-2' />}
 
 				{/* Action Buttons */}
-				{/* Action Buttons */}
 				<div className='flex justify-end space-x-3 mt-2'>
-					{/* Conditionally render the Edit button if the task is not completed */}
+					{/* Edit Button (Disabled if task is completed) */}
 					{!completed && (
 						<button
 							onClick={handleEdit}
@@ -124,6 +123,7 @@ const TaskCard = ({
 						</button>
 					)}
 
+					{/* Delete Button */}
 					<button
 						onClick={handleDelete}
 						className='text-gray-700 hover:text-red-500 transition'
