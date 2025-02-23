@@ -4,20 +4,24 @@ import React, { useState, useEffect } from "react";
 import CustomInput from "../base/CustomInput";
 import ActionButton from "../base/ActionButton";
 import PrioritySelector from "./base/PrioritySelector";
+import { createTask } from "@/apis/tasks/tasks.route"; // Import your createTask API function
+import { updateTask } from "@/apis/tasks/tasks.route"; // Import your updateTask API function
 
 interface AddTaskFormProps {
 	toggleAddTask: () => void;
 	initialTask?: {
-		title: string;
+		id: string;
 		description: string;
-		priority: "!!!" | "!!" | "!";
+		priority: "!" | "!!" | "!!!"; // Ensure priority is correctly typed
 		date: string;
-	}; // Optional for editing
+		completed: boolean;
+	};
 	onSave: (task: {
-		title: string;
+		id: string;
 		description: string;
-		priority: "!!!" | "!!" | "!";
+		priority: "HIGH" | "MEDIUM" | "LOW"; // Changed to match API
 		date: string;
+		completed: boolean;
 	}) => void;
 }
 
@@ -26,11 +30,18 @@ const AddTaskForm = ({
 	initialTask,
 	onSave,
 }: AddTaskFormProps) => {
-	const [taskForm, setTaskForm] = useState({
-		title: "",
+	const [taskForm, setTaskForm] = useState<{
+		id?: string;
+		description: string;
+		date: string;
+		priority: "!" | "!!" | "!!!"; // Correctly type priority here
+		completed: boolean;
+	}>({
+		id: "", // Task ID (empty when creating new task)
 		description: "",
 		date: "",
-		priority: "!",
+		priority: "!", // Default priority to !
+		completed: false, // Default to not completed
 	});
 
 	// Load initialTask into state if editing
@@ -45,16 +56,61 @@ const AddTaskForm = ({
 		setTaskForm((prev) => ({ ...prev, [name]: value }));
 	};
 
-	const handlePriorityChange = (priority: string) => {
+	const handlePriorityChange = (priority: "!" | "!!" | "!!!") => {
 		setTaskForm((prev) => ({ ...prev, priority }));
 	};
 
-	const handleSubmit = () => {
-		onSave({
-			...taskForm,
-			priority: taskForm.priority as "!!!" | "!!" | "!", // Ensure correct type
-		});
-		toggleAddTask(); // Close modal
+	// Map UI priority to API format
+	const mapPriorityToAPI = (
+		priority: "!" | "!!" | "!!!"
+	): "HIGH" | "MEDIUM" | "LOW" => {
+		switch (priority) {
+			case "!!!":
+				return "HIGH";
+			case "!!":
+				return "MEDIUM";
+			case "!":
+				return "LOW";
+			default:
+				return "LOW"; // Default if not mapped correctly
+		}
+	};
+
+	const handleSubmit = async () => {
+		const token = localStorage.token;
+		try {
+			// Exclude id when creating a new task
+			const { id, ...taskData } = taskForm;
+
+			// Convert date to ISO-8601 format
+			const formattedDate = new Date(taskData.date).toISOString();
+
+			const formattedTaskData = {
+				...taskData,
+				date: formattedDate, // Set the correctly formatted date
+				priority: mapPriorityToAPI(taskForm.priority),
+			};
+
+			if (initialTask) {
+				// Editing an existing task
+				const updatedTask = await updateTask(
+					initialTask.id,
+					formattedTaskData,
+					token
+				);
+				onSave(updatedTask);
+			} else {
+				// Creating a new task (remove id explicitly)
+				const { id: _, ...taskWithoutId } = formattedTaskData;
+				const newTask = await createTask(taskWithoutId, token);
+				onSave(newTask);
+			}
+
+			// Close the modal
+			toggleAddTask();
+		} catch (error) {
+			console.error("Error while submitting the task:", error);
+		}
 	};
 
 	return (
@@ -72,18 +128,9 @@ const AddTaskForm = ({
 				</h2>
 
 				<CustomInput
-					label='Title'
-					type='text'
-					placeholder='Task title'
-					name='title'
-					value={taskForm.title}
-					onChange={handleChange}
-				/>
-
-				<CustomInput
 					label='Description'
 					type='text'
-					placeholder='Buy eggs'
+					placeholder='Task description'
 					name='description'
 					value={taskForm.description}
 					onChange={handleChange}
