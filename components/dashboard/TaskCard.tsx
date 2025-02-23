@@ -1,10 +1,15 @@
 "use client";
 import { Pencil, Trash2, CheckCircle } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteTask, toggleTask, updateTask } from "@/redux/slices/tasks.slice";
+import {
+	deleteTask as deleteTaskRedux,
+	toggleTask as toggleTaskRedux,
+	updateTask as updateTaskRedux,
+} from "@/redux/slices/tasks.slice";
 import { useState } from "react";
 import AddTaskForm from "./AddTaskForm";
 import { RootState } from "@/redux/store";
+import { deleteTask, updateTask } from "@/apis/tasks/tasks.route";
 
 // Helper Function: Format Date (DD/MM/YYYY)
 const formatDate = (dateString: string) => {
@@ -30,6 +35,7 @@ const TaskCard = ({
 	const dispatch = useDispatch();
 	const [isEditing, setIsEditing] = useState(false);
 	const tasks = useSelector((state: RootState) => state.tasks);
+	const token = localStorage.token; // Get token
 
 	// Priority Symbols Mapping
 	const prioritySymbols: Record<"HIGH" | "MEDIUM" | "LOW", string> = {
@@ -46,14 +52,25 @@ const TaskCard = ({
 	};
 
 	// Handle Task Deletion
-	const handleDelete = (e: React.MouseEvent) => {
+	const handleDelete = async (e: React.MouseEvent) => {
 		e.stopPropagation();
-		dispatch(deleteTask(id));
+		try {
+			await deleteTask(id, token); // Call API to delete task
+			dispatch(deleteTaskRedux(id)); // Update Redux state
+		} catch (error) {
+			console.error("Failed to delete task:", error);
+		}
 	};
 
 	// Handle Task Completion Toggle
-	const handleToggle = () => {
-		dispatch(toggleTask(id));
+	const handleToggle = async () => {
+		const updatedCompletedStatus = !completed; // Toggle completed status
+		try {
+			await updateTask(id, { completed: updatedCompletedStatus }, token); // Call API to update task
+			dispatch(toggleTaskRedux(id)); // Update Redux state
+		} catch (error) {
+			console.error("Failed to toggle task completion:", error);
+		}
 	};
 
 	// Handle Edit Task
@@ -63,19 +80,22 @@ const TaskCard = ({
 	};
 
 	// Handle Save Edit
-	const handleSaveEdit = (updatedTask: {
+	const handleSaveEdit = async (updatedTask: {
 		description: string;
 		priority: "HIGH" | "MEDIUM" | "LOW";
 		date: string;
 	}) => {
-		dispatch(
-			updateTask({
+		try {
+			const updatedTaskData = await updateTask(
 				id,
-				...updatedTask,
-				completed: tasks.find((task) => task.id === id)?.completed ?? false,
-			})
-		);
-		setIsEditing(false);
+				{ ...updatedTask, completed },
+				token
+			);
+			dispatch(updateTaskRedux(updatedTaskData)); // Update Redux state
+			setIsEditing(false);
+		} catch (error) {
+			console.error("Failed to update task:", error);
+		}
 	};
 
 	return (
@@ -84,7 +104,7 @@ const TaskCard = ({
 			{isEditing && (
 				<AddTaskForm
 					toggleAddTask={() => setIsEditing(false)}
-					initialTask={{ id, description, priority, date }}
+					initialTask={{ id, description, priority, date, completed }}
 					onSave={handleSaveEdit}
 				/>
 			)}
@@ -102,7 +122,9 @@ const TaskCard = ({
 				{/* Priority & Date */}
 				<div className='mt-2 flex justify-between items-center'>
 					{/* Priority Indicator */}
-					<span className={priorityStyles[priority]}>{prioritySymbols[priority]}</span>
+					<span className={priorityStyles[priority]}>
+						{prioritySymbols[priority]}
+					</span>
 
 					{/* Date Display */}
 					<p className='text-sm text-gray-600'>{formatDate(date)}</p>
